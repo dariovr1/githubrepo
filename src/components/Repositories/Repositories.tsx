@@ -1,50 +1,40 @@
 import React, { FC } from "react";
-import { IRepositories } from "../interfaces";
 import { useQuery } from "@apollo/client";
 import { GET_REPOSITORIES } from "../Query";
-
-const Repository : FC<IRepositories> = ({ name, url, stargazerCount, forkCount }) => (
-    <tr>
-      <td>
-        <a href={url} target="_blank" rel="noopener noreferrer">
-          {name}
-        </a>
-      </td>
-      <td>🌟 {stargazerCount}</td>
-      <td>🍴 {forkCount}</td>
-    </tr>
-  );
-
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+import NetworkStatus from "../UI/NetworkStatus";
 
   // Repositories component
 const Repositories = () => {
-    const { loading, error, data } = useQuery(GET_REPOSITORIES);
-  
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p>Error: {error.message}</p>;
-  
-    return (
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Stars</th>
-            <th>Forks</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.search.nodes.map((repo : IRepositories) => (
-            <Repository
-              key={repo.name}
-              name={repo.name}
-              url={repo.url}
-              stargazerCount={repo.stargazerCount}
-              forkCount={repo.forkCount}
-            />
+  const { loading, error, data } = useQuery(GET_REPOSITORIES);
+  return (
+    <NetworkStatus loading={loading} error={!!error} errorMessage={"Something goes wrong: please try again later.."}>
+      <TableContainer>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Name</TableCell>
+            <TableCell>Stars</TableCell>
+            <TableCell>Forks</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {data?.search.nodes.map((repo: any) => (
+            <TableRow>
+              <TableCell>
+                <a href={repo.url} target="_blank" rel="noopener noreferrer">
+                  {repo.name}
+                </a>
+              </TableCell>
+              <TableCell>🌟 {repo.stargazerCount}</TableCell>
+              <TableCell>🍴 {repo.forkCount}</TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
-    );
+        </TableBody>
+      </Table>
+    </TableContainer>
+    </NetworkStatus>
+  );
   };
 
   export default Repositories;
